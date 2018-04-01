@@ -1,0 +1,118 @@
+<html>
+<head>
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular.min.js"></script>
+</head>
+<body ng-app="myApp" ng-controller="myController" ng-init="getUsers()">
+
+<div class="container">
+<div class="jumbotron">
+<h1>User List</h1>
+</div>
+
+<div class="row">
+<div class="col-lg-12">
+<div class="form-group">
+<label>Name</label>
+<input type="hidden" ng-model="key">
+<input ng-model="user.name" class="form-control">
+</div>
+<div class="form-group">
+<label>Age</label>
+<input ng-model="user.age" class="form-control">
+</div>
+<div class="form-group">
+<label>salary</label>
+<input ng-model="user.sal" class="form-control">
+</div>
+<div class="form-group">
+<button ng-if="btn_stt" class="btn btn-primary" ng-click="saveUser()">Save</button> 
+<button ng-if="!btn_stt" class="btn btn-primary" ng-click="updateUser()">Update</button>
+</div>
+</div>
+</div>
+
+<div class="row">
+<div class="col-lg-12">
+<table class="table">
+<th>Name</th><th>Age</th><th>Salary</th><th>Action</th>
+<tr ng-repeat="(key,x) in users">
+<td>{{x.name}}</td>
+<td>{{x.age}}</td>
+<td>{{x.sal}}</td>
+<td>
+<button ng-click="deleteUser(key)" class="btn btn-danger">
+Delete
+</button>
+<button ng-click="editUser(key,x)" class="btn btn-primary">
+Edit
+</button>
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+
+
+</body>
+<script>
+var app = angular.module("myApp",[]);
+app.controller("myController",function($scope,$http){
+
+$scope.updateUser = function(){
+console.log('Update record is ',$scope.user)
+$http.put("https://hrms-eb1fa.firebaseio.com/users/"+$scope.key+".json",$scope.user).then(function(res){
+console.log('Record updated ');
+$scope.user= {};
+$scope.btn_stt = true;
+$scope.getUsers();
+
+})
+.catch(function(err){
+console.log("The err is ",err)
+});
+}
+
+$scope.btn_stt = true;
+$scope.editUser = function(key,shrimodi){
+$scope.user = shrimodi;
+$scope.key = key;
+$scope.btn_stt = false;
+}
+
+$scope.deleteUser = function(key){
+
+$http.delete("https://hrms-eb1fa.firebaseio.com/users/"+key+".json",$scope.user).then(function(res){
+console.log('Record deleted ');
+$scope.getUsers();
+})
+.catch(function(err){
+console.log("The err is ",err)
+});
+
+}
+
+$scope.saveUser = function(){
+$http.post("https://hrms-eb1fa.firebaseio.com/users.json",$scope.user).then(function(res){
+console.log('Record saved ');
+$scope.user = {};
+$scope.getUsers();
+})
+.catch(function(err){
+console.log("The err is ",err)
+});
+}
+
+$scope.getUsers = function(){
+$http.get("https://hrms-eb1fa.firebaseio.com/users.json").then(function(res){
+console.log('The res is ',JSON.stringify(res));
+$scope.users = res.data;
+})
+.catch(function(err){
+console.log("The err is ",err)
+});
+}
+})
+</script>
+</html>
