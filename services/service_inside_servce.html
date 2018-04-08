@@ -1,0 +1,45 @@
+<html>
+<head>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular.min.js"></script>
+</head>
+<body ng-app="myApp" ng-controller="myController">
+<p>Side 1 : <input ng-model="a"></p>
+<p>Side 2 : <input ng-model="b"></p>
+<p>Side 3 : <input ng-model="c"></p>
+<p>
+Area is {{ar}}<br>
+</p>
+<p>
+<button ng-click="area()">Area</button> 
+</p>
+</body>
+<script>
+var app = angular.module("myApp",[])
+app.controller("myController",function($scope,TriangleService){
+
+$scope.area = function(){
+var t1 = parseFloat($scope.a);
+var t2 = parseFloat($scope.b);
+var t3 = parseFloat($scope.c);
+$scope.ar = TriangleService.getArea(t1,t2,t3);
+}
+
+});
+
+app.service('SemiPerimeterService',function(){
+this.getSemiPerimiter = function(a,b,c){
+return (a+b+c)/2.0;
+}
+});
+
+app.service('TriangleService',function(SemiPerimeterService){
+this.getArea = function(a,b,c){
+var s = SemiPerimeterService.getSemiPerimiter(a,b,c);
+var ar = Math.sqrt(s*(s-a)*(s-b)*(s-c));
+return ar;
+
+}
+})
+
+</script>
+</html>
