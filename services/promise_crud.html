@@ -1,0 +1,79 @@
+<html>
+<head>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular.min.js"></script>
+</head>
+<body ng-app="myApp"  ng-controller="myController" ng-init="getEmployees()">
+<p>
+Employee Name : <input ng-model="emp.emp_name"> 
+</p>
+<p>
+Employee Age : <input ng-model="emp.emp_age"> 
+</p>
+<p>
+<button ng-click="saveEmployee()">Save</button>
+</p>
+<hr>
+<table>
+<th>Name</th><th>Age</th>
+<tr ng-repeat="(key,value) in employees">
+<td>{{value.emp_name}}</td>
+<td>{{value.emp_age}}</td>
+</tr>
+</table>
+</body>
+<script>
+var app = angular.module("myApp",[])
+app.controller("myController",function($scope,EmployeeService){
+
+$scope.getEmployees = function(){
+EmployeeService.getEmployee().then(function(res){
+console.log("All record is ",res.data)
+$scope.employees = res.data;
+})
+.catch(function(err){
+console.log(err)
+});
+}
+
+$scope.saveEmployee = function(){
+
+EmployeeService.addEmployee($scope.emp).then(function(res){
+console.log("The response is ",res)
+$scope.getEmployees();
+})
+.catch(function(err){
+console.log("The error is",err)
+});
+
+}
+});
+
+app.service('EmployeeService',function($http,$q){
+this.addEmployee = function(empData){
+var obj = $q.defer();
+$http.post('https://hrms-eb1fa.firebaseio.com/employees.json',empData).then(function(res){
+obj.resolve(res);
+})
+.catch(function(err){
+obj.reject(err)
+});
+return obj.promise;
+}
+
+this.getEmployee = function(){
+var obj = $q.defer();
+$http.get('https://hrms-eb1fa.firebaseio.com/employees.json').then(function(res){
+obj.resolve(res);
+})
+.catch(function(err){
+obj.reject(err)
+});
+return obj.promise;
+
+}
+
+
+})
+
+</script>
+</html>
